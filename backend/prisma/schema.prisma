@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  name     String?
+  email    String   @unique
+  password String
+  likes    Like[]
+  comments Comment[]
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id       String   @id @default(uuid())
+  imageId  String
+  userId   String?
+  user     User?     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([imageId, userId])
+}
+
+
+model Comment {
+  id        String   @id @default(cuid())
+  imageId   String
+  text      String
+  createdAt DateTime @default(now())
+  
+  // Optional user relation for anonymous commenting
+  userId    String?    // <- make this optional
+  user      User?      @relation(fields: [userId], references: [id])
+}
+
